@@ -1,0 +1,38 @@
+# Compiled output
+/target/
+**/*.rs.bk
+
+# Rust/Cargo
+Cargo.lock
+*.rs.bk
+
+# Dependencies
+/.idea/
+/.vscode/
+/*.toml.orig
+/.DS_Store
+
+# Build artifacts
+/target/*
+target/.rustc_info.json
+/*.o
+/*.obj
+/*.so
+/*.dylib
+/*.dll
+/*.rlib
+/*.a
+
+# Binaries
+*.exe
+*.out
+*.app
+*.dmg
+*.deb
+*.snap
+*.rpm
+*.iso
+*.img
+*.pkg
+
+target/.rustc_info.json
