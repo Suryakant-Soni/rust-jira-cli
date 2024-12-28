@@ -23,7 +23,8 @@ impl JiraHandle {
     }
 
     pub fn read_full_record(&self) -> Result<DBState> {
-        self.database.read_db()
+        self.database
+            .read_db()
     }
 
     pub fn create_epic(&self, epic: Epic) -> Result<u32> {
@@ -32,9 +33,10 @@ impl JiraHandle {
             .epics
             .insert(db_state.last_item_id + 1, epic)
             .ok_or_else(|| anyhow::Error::msg("error creating epic"));
-
-        self.database.write_db(&db_state);
-        Ok(db_state.last_item_id + 1)
+        db_state.last_item_id += 1;
+        self.database
+            .write_db(&db_state);
+        Ok(db_state.last_item_id)
     }
 
     pub fn create_story(&self, story: Story, epic_id: u32) -> Result<u32> {
@@ -50,7 +52,9 @@ impl JiraHandle {
             .ok_or_else(|| anyhow!("could not find epic in database"))?
             .stories
             .push(new_id);
-        self.database.write_db(&db_state);
+        db_state.last_item_id += 1;
+        self.database
+            .write_db(&db_state);
         Ok(new_id)
     }
 
@@ -62,13 +66,40 @@ impl JiraHandle {
             .ok_or_else(|| anyhow!("error in finding epic {epic_id} in database"))?
             .stories
         {
-            db_state.stories.remove(story_id);
+            db_state
+                .stories
+                .remove(story_id);
         }
         db_state
             .epics
             .remove(&epic_id)
             .ok_or_else(|| anyhow::Error::msg("error while deleting epic"));
-        self.database.write_db(&db_state);
+        self.database
+            .write_db(&db_state);
+        Ok(())
+    }
+
+    pub fn delete_story(&self, epic_id: u32, story_id: u32) -> Result<()> {
+        let mut db_state = self.read_full_record()?;
+        let epic_mut = db_state
+            .epics
+            .get_mut(&epic_id)
+            .ok_or_else(|| anyhow!("could not find epic with id {epic_id}"))?;
+        let story_index = epic_mut
+            .stories
+            .iter()
+            .position(|id| id == &story_id)
+            .ok_or_else(|| anyhow!("story is not found in epic stories vector"))?;
+        //remove the story id from epic object
+        epic_mut
+            .stories
+            .remove(story_index);
+        // remove story object form story hashmap
+        db_state
+            .stories
+            .remove(&story_id);
+        self.database
+            .write_db(&db_state);
         Ok(())
     }
 
@@ -79,7 +110,8 @@ impl JiraHandle {
             .get_mut(&epic_id)
             .ok_or_else(|| anyhow!("could not find epic with id {epic_id}"))?
             .status = status;
-        self.database.write_db(&db_state);
+        self.database
+            .write_db(&db_state);
         Ok(())
     }
     pub fn update_story_status(&self, story_id: u32, status: Status) -> Result<()> {
@@ -89,7 +121,8 @@ impl JiraHandle {
             .get_mut(&story_id)
             .ok_or_else(|| anyhow!("could not find story with id {story_id}"))?
             .status = status;
-        self.database.write_db(&db_state);
+        self.database
+            .write_db(&db_state);
         Ok(())
     }
 }
@@ -120,7 +153,9 @@ impl Database for JSONFileDatabase {
         Ok(())
     }
 }
-#[cfg(test)]
 mod tests {
-    mod db_tests;
+    use super::*;
+    mod db_tests; // tests for db reads and writes
+    mod jira_crud_tests;
+    mod test_utils; // utility for testing purpose // test for crud operation from server layer
 }
