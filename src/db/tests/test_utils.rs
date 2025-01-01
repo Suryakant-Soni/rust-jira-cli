@@ -3,7 +3,7 @@ use anyhow::{Ok, Result};
 use std::{cell::RefCell, collections::HashMap};
 
 pub struct MockDB {
-    state: RefCell<DBState>,
+    pub state: RefCell<DBState>,
 }
 
 impl MockDB {

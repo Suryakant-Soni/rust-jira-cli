@@ -4,14 +4,14 @@ use crate::models::{DBState, Epic, Status, Story};
 use anyhow::{anyhow, Error, Ok, Result};
 use serde::{Deserialize, Serialize};
 
-trait Database {
+pub trait Database {
     fn read_db(&self) -> Result<DBState>;
     fn write_db(&self, db_state: &DBState) -> Result<()>;
 }
 
 // need struct to handle CRUD operation
 pub struct JiraHandle {
-    database: Box<dyn Database>,
+    pub database: Box<dyn Database>,
 }
 
 impl JiraHandle {
@@ -127,7 +127,7 @@ impl JiraHandle {
     }
 }
 
-struct JSONFileDatabase {
+pub struct JSONFileDatabase {
     pub file_path: String,
 }
 
@@ -153,9 +153,9 @@ impl Database for JSONFileDatabase {
         Ok(())
     }
 }
-mod tests {
+pub mod tests {
     use super::*;
-    mod db_tests; // tests for db reads and writes
-    mod jira_crud_tests;
-    mod test_utils; // utility for testing purpose // test for crud operation from server layer
+    pub mod db_tests; // tests for db reads and writes
+    pub mod jira_crud_tests;
+    pub mod test_utils; // utility for testing purpose // test for crud operation from server layer
 }
