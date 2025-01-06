@@ -1,5 +1,5 @@
 # rust-jira-cli
-rust cli for creating epics, stories and updating their status using rust
+rust cli for creating epics, stories and updating their status using rust, some insight points -
 
 1. difference between ok_or and ok_or_else - ok_or taken an error object while ok_or_else taken closure which generated error object only in case of error path
 2. "anyhow" usage saves some boiler plate code - using Result object from anyhow library and using anyhow macro saves some code for error handling and makes it easy
